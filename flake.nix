@@ -19,9 +19,20 @@
         };
         rust-toolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
       in {
-        devShells.default = pkgs.mkShell {
+        devShells.default = inputs.self.devShells.${system}.full;
+
+        devShells.full = pkgs.mkShell {
+          inputsFrom = [inputs.self.devShells.${system}.base];
+          packages = with pkgs; [gh curl jq];
+        };
+
+        devShells.base = pkgs.mkShell {
           packages =
-            (with pkgs; [openssl pkg-config cargo-hack])
+            (with pkgs; [
+              openssl
+              pkg-config
+              cargo-hack
+            ])
             ++ [
               (rust-toolchain.override
                 {extensions = ["rust-src" "rust-analyzer" "clippy"];})
