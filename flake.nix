@@ -1,5 +1,5 @@
 {
-  nixConfig.bash-prompt-prefix = ''\[\e[0;31m\](rust) \e[0m'';
+  nixConfig.bash-prompt-prefix = ''\[\e[0;31m\](node) \e[0m'';
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
@@ -17,7 +17,6 @@
           inherit system;
           overlays = [inputs.rust-overlay.overlays.default];
         };
-        rust-toolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
       in {
         devShells.default = inputs.self.devShells.${system}.full;
 
@@ -27,16 +26,14 @@
         };
 
         devShells.base = pkgs.mkShell {
-          packages =
-            (with pkgs; [
-              openssl
-              pkg-config
-              cargo-hack
-            ])
-            ++ [
-              (rust-toolchain.override
-                {extensions = ["rust-src" "rust-analyzer" "clippy"];})
-            ];
+          packages = with pkgs; [
+            pnpm
+            nodePackages_latest.vscode-langservers-extracted
+            nodePackages_latest.nodejs
+
+            vtsls
+            prettierd
+          ];
         };
       }
     );
